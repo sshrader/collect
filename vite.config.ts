@@ -7,6 +7,6 @@ export default defineConfig({
   define: { global: 'globalThis' }, // a few Solana packages still refer to Node's `global`
   server: {
     port: 5173,
-    proxy: { '/api': 'http://localhost:8787', '/meta': 'http://localhost:8787', '/img': 'http://localhost:8787' },
+    proxy: { '/api': 'http://localhost:8787', '/meta': 'http://localhost:8787', '/img': 'http://localhost:8787', '/nft': 'http://localhost:8787' },
   },
 });

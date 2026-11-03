@@ -25,6 +25,23 @@ npm run dev                     # http://localhost:5173
 
 On Railway: build `npm install && npm run build`, start `npm start`, health check `/api/health`. Set `PUBLIC_URL` to your real address, `DBC_CONFIG`, `SOLANA_RPC_URL`, `TRUST_PROXY=1`, and mount a volume with `DATA_DIR=/data`.
 
+## The collectibles (what makes Collect different)
+
+Every coin launched here comes with **40 unique collectible characters**.
+
+1. The creator launches the coin on the Meteora bonding curve (the same config as the Pawpad launchpad), with an optional **dev buy** made in the same transaction that creates the pool, so nobody can buy first.
+2. The creator describes the characters: a theme, an art style and 2 to 5 trait lists (for example Species, Hat, Item, Mood). Collect combines the lists into 40 different combinations (no two alike) and shows them before launch.
+3. After the launch confirms, the server draws the 40 pictures in the background (`server/queue.mjs`). The coin page fills in as they finish. With `IMAGE_API_KEY` set they come from an image model; without it you get test placeholders.
+4. When all 40 exist, claiming opens. The **keeper** (`server/keeper.mjs`) checks the coin's holders every minute. A normal wallet that has held at least the creator's minimum (0.05% to 1% of supply) for about 90 seconds is handed one random unclaimed character, minted as a **Metaplex Core NFT** straight to its wallet. One per wallet, earliest first, 40 in total. The NFT is the holder's to keep or trade, even if they sell the coin.
+
+Rules live at the top of `server/keeper.mjs`. Program-owned accounts (the curve vault, DEX pools) never qualify.
+
+Settings: `AUTHORITY_KEYPAIR` (wallet that pays about 0.003 SOL per NFT; keep it nearly empty), `IMAGE_API_KEY`/`IMAGE_API_URL`/`IMAGE_MODEL`, `MAX_DEV_BUY_SOL`, `LAUNCH_FEE_SOL`/`LAUNCH_FEE_WALLET` (the fee is added to the creator's launch transaction to pay for the pictures).
+
+Known limits: one person can use several wallets to claim several characters; a coin whose pictures keep failing stays on "drawing" (no admin retry yet); the page shows who claimed each character, not who owns the NFT today.
+
+Not yet run against a real network: `createPoolWithFirstBuy`, the holder lookup and the Core mint are written from the SDK docs and have only been checked with fakes. Expect first-run fixes on devnet.
+
 ## Settings you can change (in `.env`, before `npm run dbc-config`)
 
 | Variable | Meaning |

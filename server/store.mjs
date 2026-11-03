@@ -49,6 +49,26 @@ export function expirePending(maxAgeMs, now = Date.now()) {
   }
 }
 
+/** Changes a token in place (fn gets the stored object) and saves. Returns the token, or null. */
+export function update(id, fn) {
+  const t = db.tokens.find((x) => x.id === id);
+  if (!t) return null;
+  fn(t);
+  save();
+  return t;
+}
+
+export const all = () => db.tokens;
+
+/** Where one collectible's image file lives. Folders are per coin. */
+export const nftFile = (t, n, ext) => path.join(DIR, 'nft', t.id, `${Number(n)}.${ext}`);
+export function saveNft(t, n, ext, bytes) {
+  fs.mkdirSync(path.join(DIR, 'nft', t.id), { recursive: true });
+  const f = nftFile(t, n, ext);
+  fs.writeFileSync(f + '.tmp', bytes);
+  fs.renameSync(f + '.tmp', f);
+}
+
 export const get = (idOrMint) => db.tokens.find((t) => t.id === idOrMint || t.mint === idOrMint) || null;
 
 export function markLive(id, signature) {
@@ -82,4 +102,23 @@ export const publicView = (t) => ({
   status: t.status,
   signature: t.signature || null,
   launchedAt: t.launchedAt || null,
+  collection: t.collection ? collectionView(t) : null,
+});
+
+/** The collectibles as the website needs them. Prompts and internals stay on the server. */
+export const collectionView = (t) => ({
+  theme: t.collection.spec.theme,
+  state: t.collection.state, // generating | open
+  minPct: t.collection.minPct,
+  minTokens: t.collection.minTokens, // whole tokens a wallet must hold to qualify
+  ready: t.collection.slots.filter((s) => s.status === 'ready').length,
+  claimed: t.collection.slots.filter((s) => s.owner).length,
+  slots: t.collection.slots.map((s) => ({
+    n: s.n,
+    name: s.name,
+    attributes: s.attributes,
+    image: s.status === 'ready' ? `/nft/${t.id}/${s.n}.${s.ext}` : null,
+    owner: s.owner || null,
+    asset: s.mintStatus === 'done' ? s.asset : null,
+  })),
 });

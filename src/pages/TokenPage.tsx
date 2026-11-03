@@ -1,19 +1,28 @@
 import { useEffect, useState } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { getToken, type TokenView } from '../lib/api';
 import { explorer, short } from '../lib/config';
 
 export function TokenPage({ keyId }: { keyId: string }) {
+  const { publicKey } = useWallet();
+  const me = publicKey?.toBase58();
   const [t, setT] = useState<TokenView | null>(null);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   useEffect(() => {
-    getToken(keyId).then(setT).catch((e) => setError(e.message));
+    let alive = true;
+    const load = () => getToken(keyId).then((x) => alive && setT(x)).catch((e) => alive && setError(e.message));
+    load();
+    const timer = setInterval(load, 8000); // pictures appear and collectibles get claimed while you watch
+    return () => { alive = false; clearInterval(timer); };
   }, [keyId]);
-  if (error) return <section className="narrow"><p className="err">{error}</p><a href="#/">Back to all tokens</a></section>;
+  if (error && !t) return <section className="narrow"><p className="err">{error}</p><a href="#/">Back to all coins</a></section>;
   if (!t) return <section className="narrow"><p className="dim">Loading...</p></section>;
   const copy = () => navigator.clipboard?.writeText(t.mint).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }, () => {});
+  const c = t.collection;
+  const mine = c?.slots.filter((s) => s.owner && s.owner === me) ?? [];
   return (
-    <section className="narrow">
+    <section>
       <div className="tokenhead">
         <img src={t.image} alt="" width={120} height={120} />
         <div>
@@ -33,7 +42,33 @@ export function TokenPage({ keyId }: { keyId: string }) {
         {t.links.twitter && <a className="btn" href={t.links.twitter} target="_blank" rel="noopener noreferrer">X</a>}
         {t.links.telegram && <a className="btn" href={t.links.telegram} target="_blank" rel="noopener noreferrer">Telegram</a>}
       </div>
-      <p className="dim small">Live price, curve progress and a trade button are the next piece to build (see the README roadmap).</p>
+
+      {c && (
+        <>
+          <h2>The 40 collectibles <span className="dim small">{c.theme}</span></h2>
+          {c.state === 'generating' ? (
+            <p className="card">Drawing the characters: {c.ready} of 40 done. Claiming opens when all 40 are ready.</p>
+          ) : (
+            <p className="card">
+              <b>Claiming is open: {c.claimed} of 40 taken.</b> Hold at least <b>{c.minTokens.toLocaleString()}</b> {t.symbol} ({c.minPct}% of the supply) in a normal wallet for about two minutes and one character is picked for you and sent to that wallet as an NFT. One per wallet. It stays yours even if you sell the coin, and only one wallet can own each character.
+            </p>
+          )}
+          {mine.length > 0 && <p className="ok">You own {mine.map((s) => s.name).join(', ')}.</p>}
+          <div className="nfts">
+            {c.slots.map((s) => (
+              <figure key={s.n} className={`nft${s.owner ? ' taken' : ''}${s.owner && s.owner === me ? ' mine' : ''}`}>
+                {s.image ? <img src={s.image} alt={`${s.name}: ${s.attributes.map((a) => a.value).join(', ')}`} loading="lazy" width={200} height={200} /> : <div className="blank" aria-label="Still being drawn">...</div>}
+                <figcaption>
+                  <b>{s.name}</b>
+                  <small>{s.attributes.map((a) => a.value).join(' · ')}</small>
+                  <small className={s.owner ? 'own' : 'dim'}>{s.owner ? `Owner ${short(s.owner)}` : 'Unclaimed'}</small>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </>
+      )}
+      <p className="dim small">Live price, curve progress and a trade button are still to build (see the README roadmap).</p>
     </section>
   );
 }

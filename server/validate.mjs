@@ -38,7 +38,13 @@ export function validateLaunch(body) {
     links[key] = r.value;
   }
   if (typeof body.image !== 'string' || !body.image.startsWith('data:')) return { ok: false, error: 'Add a token image.' };
-  return { ok: true, value: { wallet: body.wallet, name, symbol, description, links, image: body.image } };
+  // Dev buy: SOL the creator spends on the coin in the same transaction that creates it. 0 = none.
+  const devBuy = body.devBuy === undefined || body.devBuy === '' || body.devBuy === null ? 0 : Number(body.devBuy);
+  if (!Number.isFinite(devBuy) || devBuy < 0 || devBuy > 1e6) return { ok: false, error: 'Dev buy must be a number of SOL, 0 or more.' };
+  // Holding needed to claim a collectible, as a % of supply.
+  const minPct = body.minPct === undefined || body.minPct === '' ? 0.1 : Number(body.minPct);
+  if (!Number.isFinite(minPct) || minPct < 0.01 || minPct > 2) return { ok: false, error: 'The holding needed to claim must be between 0.01% and 2% of the supply.' };
+  return { ok: true, value: { wallet: body.wallet, name, symbol, description, links, image: body.image, devBuy: Math.round(devBuy * 1e9) / 1e9, minPct, collection: body.collection } };
 }
 
 /** Decodes a data: URL and checks the file really is a PNG, JPEG or WebP (never SVG: it can carry scripts). */

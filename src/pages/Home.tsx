@@ -13,9 +13,9 @@ export function Home() {
   return (
     <section>
       <div className="hero">
-        <h1>Launch a token in a minute.</h1>
-        <p>Pick a name, a ticker and a picture. Your token starts on a Meteora bonding curve, so anyone can trade it right away and it graduates to a DEX pool once the curve fills.</p>
-        <a className="btn primary" href="#/create">Launch a token</a>
+        <h1>A coin with 40 collectibles.</h1>
+        <p>Launch a coin on a Meteora bonding curve, with an optional dev buy. Describe your characters and Collect draws 40 unique ones. Each holder who qualifies is sent one as an NFT, and only one wallet can own each.</p>
+        <a className="btn primary" href="#/create">Launch a coin</a>
       </div>
       <input className="search" placeholder="Search name, ticker or mint" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search tokens" />
       {error && <p className="err">{error}</p>}
@@ -27,7 +27,7 @@ export function Home() {
             <div>
               <h3>{t.name} <span className="sym">${t.symbol}</span></h3>
               <p className="dim">{t.description || 'No description.'}</p>
-              <small>by {short(t.creator)}</small>
+              <small>by {short(t.creator)}{t.collection ? ` · ${t.collection.claimed}/40 claimed` : ''}</small>
             </div>
           </a>
         ))}

@@ -42,6 +42,11 @@ export async function pass({ art, concurrency = 2, now = Date.now() } = {}) {
 
 let running = false;
 export function start(art, everyMs = 5000) {
+  // A restart gives every unfinished picture a fresh set of tries (so fixing the key and restarting is enough).
+  for (const t of store.all()) {
+    if (t.collection?.state !== 'generating') continue;
+    store.update(t.id, (x) => x.collection.slots.forEach((s) => { if (s.status !== 'ready') { s.attempts = 0; s.retryAt = 0; } }));
+  }
   const tick = async () => {
     if (running) return;
     running = true;

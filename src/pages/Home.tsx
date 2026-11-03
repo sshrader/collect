@@ -16,7 +16,7 @@ export function Home() {
         <span className="tag"><i></i>Devnet · test coins</span>
         <h1><span className="neon">A coin with</span><br /><span className="alt">40 collectibles.</span></h1>
         <p>Launch a coin on a Meteora bonding curve, with an optional dev buy. Describe your characters and Collect draws 40 unique ones. Each holder who qualifies is sent one as an NFT, and only one wallet can own each.</p>
-        <a className="btn primary" href="#/create">Launch a coin</a>
+        <div className="links"><a className="btn primary" href="#/create">Launch a coin</a><a className="btn" href="#/how">How it works</a></div>
       </div>
       <div className="label"><b>01</b> Coins</div>
       <input className="search" placeholder="Search name, ticker or mint" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search tokens" />

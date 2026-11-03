@@ -91,3 +91,8 @@ footer { background: transparent; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 .brand { display: inline-flex; align-items: center; gap: 10px; }
 .brand .mark { filter: drop-shadow(0 0 8px rgba(182,255,26,.5)); }
+ol.steps { list-style: none; margin: 24px 0; padding: 0; display: grid; gap: 14px; }
+ol.steps li { display: flex; gap: 16px; align-items: flex-start; }
+ol.steps h3 { margin: 0 0 4px; color: var(--text); }
+ol.steps p { margin: 0; color: var(--dim); }
+.stepno { font: 700 28px var(--head); background: linear-gradient(95deg, var(--lime), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; min-width: 40px; }

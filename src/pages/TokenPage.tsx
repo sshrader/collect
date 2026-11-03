@@ -45,12 +45,12 @@ export function TokenPage({ keyId }: { keyId: string }) {
 
       {c && (
         <>
-          <h2>The 40 collectibles <span className="dim small">{c.theme}</span></h2>
+          <h2>The {c.size} collectibles <span className="dim small">{c.theme}</span></h2>
           {c.state === 'generating' ? (
-            <p className="card">Drawing the characters: {c.ready} of 40 done. Claiming opens when all 40 are ready.</p>
+            <p className="card">Drawing the characters: {c.ready} of {c.size} done. Claiming opens when all {c.size} are ready.</p>
           ) : (
             <p className="card">
-              <b>Claiming is open: {c.claimed} of 40 taken.</b> Hold at least <b>{c.minTokens.toLocaleString()}</b> {t.symbol} ({c.minPct}% of the supply) in a normal wallet for about two minutes and one character is picked for you and sent to that wallet as an NFT. One per wallet. It stays yours even if you sell the coin, and only one wallet can own each character.
+              <b>Claiming is open: {c.claimed} of {c.size} taken.</b> Hold at least <b>{c.minTokens.toLocaleString()}</b> {t.symbol} ({c.minPct}% of the supply) in a normal wallet for about two minutes and one character is picked for you and sent to that wallet as an NFT. One per wallet. It stays yours even if you sell the coin, and only one wallet can own each character.
             </p>
           )}
           {mine.length > 0 && <p className="ok">You own {mine.map((s) => s.name).join(', ')}.</p>}

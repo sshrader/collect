@@ -6,7 +6,7 @@ import express from 'express';
 import * as store from './store.mjs';
 import { MIME } from './validate.mjs';
 import { UserError, cluster, confirm, launchReady, metadataFor, nftMetadataFor, prepare } from './launch.mjs';
-import { buildRoster, validateCollection } from './roster.mjs';
+import { SLOTS, buildRoster, validateCollection } from './roster.mjs';
 import * as queue from './queue.mjs';
 import * as art from './art.mjs';
 import * as keeper from './keeper.mjs';
@@ -42,6 +42,7 @@ app.get('/api/config', (_req, res) =>
   res.json({
     ready: launchReady(),
     cluster: cluster(),
+    slots: SLOTS,
     maxDevBuy: Number(process.env.MAX_DEV_BUY_SOL || 5),
     launchFee: Number(process.env.LAUNCH_FEE_SOL || 0),
     realArt: art.usingAi(), // false = test placeholder pictures
@@ -89,7 +90,7 @@ app.get('/nft/:id/:file', (req, res) => {
   if (!m) return res.status(404).end();
   if (m[1] === 'collection') {
     if (m[2] !== 'json') return res.status(404).end();
-    return res.json({ name: `${t.name} Collectibles`, symbol: t.symbol, description: `40 unique ${t.collection.spec.theme} collectibles for $${t.symbol}.`, image: `${(process.env.PUBLIC_URL || '').replace(/\/+$/, '')}/img/${t.id}` });
+    return res.json({ name: `${t.name} Collectibles`, symbol: t.symbol, description: `${t.collection.slots.length} unique ${t.collection.spec.theme} collectibles for $${t.symbol}.`, image: `${(process.env.PUBLIC_URL || '').replace(/\/+$/, '')}/img/${t.id}` });
   }
   const slot = t.collection.slots.find((x) => x.n === Number(m[1]));
   if (!slot || slot.status !== 'ready') return res.status(404).end();

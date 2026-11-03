@@ -29,7 +29,7 @@ export function Home() {
             <div>
               <h3>{t.name} <span className="sym">${t.symbol}</span></h3>
               <p className="dim">{t.description || 'No description.'}</p>
-              <small>by {short(t.creator)}{t.collection ? ` · ${t.collection.claimed}/40 claimed` : ''}</small>
+              <small>by {short(t.creator)}{t.collection ? ` · ${t.collection.claimed}/{t.collection.size} claimed` : ''}</small>
             </div>
           </a>
         ))}

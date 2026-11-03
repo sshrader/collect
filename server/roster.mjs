@@ -6,7 +6,8 @@
 // unique combination, so no two characters are alike, and each gets a text prompt for the image model.
 import crypto from 'node:crypto';
 
-export const SLOTS = 40;
+// How many collectibles each coin gets. 40 for real launches; set COLLECTION_SIZE=5 (2 to 40) to test cheaply.
+export const SLOTS = Math.min(40, Math.max(2, Math.floor(Number(process.env.COLLECTION_SIZE)) || 40));
 const CTRL = /[\u0000-\u001f\u007f<>]/;
 export const DEFAULT_STYLE = 'flat vector sticker art, bold clean outlines, one centered full-body character, plain solid background, no text';
 

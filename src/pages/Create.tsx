@@ -40,7 +40,8 @@ export function Create() {
   const collection = useMemo(() => ({ theme, style, traits: traits.map((t) => ({ label: t.label, options: list(t.options) })) }), [theme, style, traits]);
   const combos = useMemo(() => collection.traits.filter((t) => t.label && t.options.length).reduce((n, t) => n * t.options.length, 1), [collection]);
   const filled = collection.traits.filter((t) => t.label && t.options.length).length;
-  const enough = filled >= 2 && combos >= 40;
+  const size = cfg?.slots ?? 40;
+  const enough = filled >= 2 && combos >= size;
   const setRow = (i: number, k: keyof TraitRow, v: string) => { setTraits(traits.map((t, j) => (j === i ? { ...t, [k]: v } : t))); setPreview(null); };
 
   async function pick(file?: File) {
@@ -54,7 +55,7 @@ export function Create() {
   async function showPreview() {
     setError('');
     try {
-      setBusy('Building the 40...');
+      setBusy('Building the characters...');
       setPreview((await previewCollection(f.name || 'Name', collection)).slots);
     } catch (err) {
       setError((err as Error).message);
@@ -101,7 +102,7 @@ export function Create() {
     <section className="narrow">
       <h1>Launch a coin</h1>
       <p className="dim">You pay the network fees from your wallet. The name, ticker, picture and collectible traits are permanent once the coin exists.</p>
-      {cfg && !cfg.realArt && <p className="banner">Test mode: the 40 pictures will be simple placeholders until an image service is connected.</p>}
+      {cfg && !cfg.realArt && <p className="banner">Test mode: the pictures will be simple placeholders until an image service is connected.</p>}
       <form onSubmit={launch}>
         <h2>The coin</h2>
         <label htmlFor="name">Name</label>
@@ -123,8 +124,8 @@ export function Create() {
         <input id="devBuy" value={f.devBuy} onChange={set('devBuy')} inputMode="decimal" placeholder="0" />
         <p className="dim small">Bought in the same transaction that creates the coin, so nobody can buy before you.</p>
 
-        <h2>The 40 collectibles</h2>
-        <p className="dim small">Describe the characters. Collect combines your trait lists into 40 different characters (no two alike) and draws each one. Holders who qualify are sent one as an NFT.</p>
+        <h2>The {size} collectibles</h2>
+        <p className="dim small">Describe the characters. Collect combines your trait lists into {size} different characters (no two alike) and draws each one. Holders who qualify are sent one as an NFT.</p>
         <label htmlFor="theme">Theme</label>
         <input id="theme" value={theme} onChange={(e) => { setTheme(e.target.value); setPreview(null); }} maxLength={100} placeholder="space frogs on a mining crew" />
         <label htmlFor="style">Art style (optional)</label>
@@ -140,8 +141,8 @@ export function Create() {
           {traits.length < 5 && <button type="button" className="btn" onClick={() => setTraits([...traits, { label: '', options: '' }])}>Add a trait list</button>}
           <button type="button" className="btn" onClick={() => { setTraits(EXAMPLE); setTheme('space frogs on a mining crew'); setPreview(null); }}>Fill with an example</button>
         </div>
-        <p className={enough ? 'ok' : 'dim'}>{filled < 2 ? 'Fill in at least two trait lists.' : `${combos} different characters possible${enough ? '.' : ': you need at least 40.'}`}</p>
-        <button type="button" className="btn" disabled={!enough || theme.trim().length < 3 || !!busy} onClick={showPreview}>Preview the 40</button>
+        <p className={enough ? 'ok' : 'dim'}>{filled < 2 ? 'Fill in at least two trait lists.' : `${combos} different characters possible${enough ? '.' : `: you need at least ${size}.`}`}</p>
+        <button type="button" className="btn" disabled={!enough || theme.trim().length < 3 || !!busy} onClick={showPreview}>Preview the {size}</button>
         {preview && (
           <ol className="roster">
             {preview.map((s) => <li key={s.n}><b>{s.name}</b> {s.attributes.map((a) => a.value).join(' · ')}</li>)}
@@ -151,7 +152,7 @@ export function Create() {
         <select id="minPct" value={f.minPct} onChange={set('minPct')}>
           {['0.05', '0.1', '0.25', '0.5', '1'].map((v) => <option key={v} value={v}>{v}% ({(10_000_000 * Number(v)).toLocaleString()} coins)</option>)}
         </select>
-        {cfg && cfg.launchFee > 0 && <p className="dim small">Launch fee: {cfg.launchFee} SOL, which pays for drawing the 40 pictures.</p>}
+        {cfg && cfg.launchFee > 0 && <p className="dim small">Launch fee: {cfg.launchFee} SOL, which pays for drawing the pictures.</p>}
 
         {error && <p className="err" role="alert">{error}</p>}
         {publicKey ? (

@@ -14,9 +14,9 @@ export type TokenView = {
 };
 
 export type Slot = { n: number; name: string; attributes: { label: string; value: string }[]; image: string | null; owner: string | null; asset: string | null };
-export type Collection = { theme: string; state: 'generating' | 'open'; minPct: number; minTokens: number; ready: number; claimed: number; slots: Slot[] };
+export type Collection = { theme: string; size: number; state: 'generating' | 'open'; minPct: number; minTokens: number; ready: number; claimed: number; slots: Slot[] };
 export type TraitRow = { label: string; options: string };
-export type AppConfig = { ready: boolean; cluster: string; maxDevBuy: number; launchFee: number; realArt: boolean; minting: boolean };
+export type AppConfig = { ready: boolean; cluster: string; maxDevBuy: number; launchFee: number; slots: number; realArt: boolean; minting: boolean };
 
 async function call<T>(url: string, body?: unknown): Promise<T> {
   const res = await fetch(url, body === undefined ? undefined : { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });

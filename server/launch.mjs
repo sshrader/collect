@@ -114,7 +114,7 @@ export function nftMetadataFor(t, slot) {
   return {
     name: slot.name,
     symbol: t.symbol,
-    description: `${slot.name}: one of 40 unique ${t.collection.spec.theme} collectibles for $${t.symbol}. Only one wallet owns each.`,
+    description: `${slot.name}: one of ${t.collection.slots.length} unique ${t.collection.spec.theme} collectibles for $${t.symbol}. Only one wallet owns each.`,
     image: `${PUBLIC_URL}/nft/${t.id}/${slot.n}.${slot.ext}`,
     external_url: `${PUBLIC_URL}/#/token/${t.id}`,
     attributes: slot.attributes.map((a) => ({ trait_type: a.label, value: a.value })),

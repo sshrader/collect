@@ -108,6 +108,7 @@ export const publicView = (t) => ({
 /** The collectibles as the website needs them. Prompts and internals stay on the server. */
 export const collectionView = (t) => ({
   theme: t.collection.spec.theme,
+  size: t.collection.slots.length,
   state: t.collection.state, // generating | open
   minPct: t.collection.minPct,
   minTokens: t.collection.minTokens, // whole tokens a wallet must hold to qualify

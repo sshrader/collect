@@ -118,6 +118,6 @@ export function nftMetadataFor(t, slot) {
     image: `${PUBLIC_URL}/nft/${t.id}/${slot.n}.${slot.ext}`,
     external_url: `${PUBLIC_URL}/#/token/${t.id}`,
     attributes: slot.attributes.map((a) => ({ trait_type: a.label, value: a.value })),
-    properties: { files: [{ uri: `${PUBLIC_URL}/nft/${t.id}/${slot.n}.${slot.ext}`, type: slot.ext === 'png' ? 'image/png' : 'image/svg+xml' }], category: 'image' },
+    properties: { files: [{ uri: `${PUBLIC_URL}/nft/${t.id}/${slot.n}.${slot.ext}`, type: { png: 'image/png', jpg: 'image/jpeg', svg: 'image/svg+xml' }[slot.ext] }], category: 'image' },
   };
 }

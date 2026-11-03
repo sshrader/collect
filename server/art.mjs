@@ -10,12 +10,35 @@ const URL_ = process.env.IMAGE_API_URL || 'https://api.openai.com/v1/images/gene
 const MODEL = process.env.IMAGE_MODEL || 'gpt-image-2.5-flare';
 const SIZE = process.env.IMAGE_SIZE || '1024x1024';
 const QUALITY = (process.env.IMAGE_QUALITY || '').trim(); // low | medium | high; empty = the service default
-const PROVIDER = (process.env.IMAGE_PROVIDER || 'openai').toLowerCase(); // openai | gemini
+const PROVIDER = (process.env.IMAGE_PROVIDER || 'openai').toLowerCase(); // openai | gemini | cloudflare
 const MAX_BYTES = 6_000_000;
 
 export const usingAi = () => !!KEY;
 
 const isPng = (b) => b.length > 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47;
+
+const isJpg = (b) => b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
+
+/** Cloudflare Workers AI (FLUX.1 schnell). Has a real free allowance: 10,000 "neurons" a day, about 170 pictures. */
+async function fromCloudflare(prompt) {
+  const account = (process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
+  if (!/^[0-9a-f]{32}$/i.test(account)) throw new Error('CLOUDFLARE_ACCOUNT_ID is missing or not valid');
+  const model = process.env.IMAGE_MODEL || '@cf/black-forest-labs/flux-1-schnell';
+  const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/ai/run/${model}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${KEY}` },
+    body: JSON.stringify({ prompt: prompt.slice(0, 2000), steps: 6 }),
+    signal: AbortSignal.timeout(120_000),
+  });
+  if (!res.ok) throw new Error(`image service answered ${res.status}`);
+  const b64 = (await res.json())?.result?.image;
+  if (!b64) throw new Error('image service returned no image');
+  const bytes = Buffer.from(b64, 'base64');
+  if (bytes.length > MAX_BYTES) throw new Error('image is too large');
+  if (isPng(bytes)) return { bytes, ext: 'png' };
+  if (isJpg(bytes)) return { bytes, ext: 'jpg' };
+  throw new Error('image service did not return a PNG or JPEG');
+}
 
 /** Google's Gemini image models (free tier in Google AI Studio). Key from aistudio.google.com. */
 async function fromGemini(prompt) {
@@ -83,5 +106,5 @@ export function placeholder(slot, seed = '') {
 /** Draws one slot. `seed` should be the coin id so placeholders differ per coin. */
 export async function render(slot, seed) {
   if (!KEY) return placeholder(slot, seed);
-  return PROVIDER === 'gemini' ? fromGemini(slot.prompt) : fromAi(slot.prompt);
+  return PROVIDER === 'gemini' ? fromGemini(slot.prompt) : PROVIDER === 'cloudflare' ? fromCloudflare(slot.prompt) : fromAi(slot.prompt);
 }

@@ -86,7 +86,7 @@ app.get('/meta/:id.json', (req, res) => {
 app.get('/nft/:id/:file', (req, res) => {
   const t = store.get(req.params.id);
   if (!t?.collection) return res.status(404).end();
-  const m = /^(collection|\d{1,2})\.(json|png|svg)$/.exec(req.params.file);
+  const m = /^(collection|\d{1,2})\.(json|png|jpg|svg)$/.exec(req.params.file);
   if (!m) return res.status(404).end();
   if (m[1] === 'collection') {
     if (m[2] !== 'json') return res.status(404).end();
@@ -101,7 +101,7 @@ app.get('/nft/:id/:file', (req, res) => {
   if (m[2] !== slot.ext) return res.status(404).end();
   const file = store.nftFile(t, slot.n, slot.ext);
   if (!fs.existsSync(file)) return res.status(404).end();
-  res.setHeader('content-type', slot.ext === 'png' ? 'image/png' : 'image/svg+xml');
+  res.setHeader('content-type', { png: 'image/png', jpg: 'image/jpeg', svg: 'image/svg+xml' }[slot.ext]);
   res.setHeader('content-security-policy', "default-src 'none'; style-src 'unsafe-inline'"); // an SVG opened directly can never run script
   res.setHeader('cache-control', 'public, max-age=86400');
   fs.createReadStream(file).pipe(res);

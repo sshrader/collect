@@ -17,7 +17,7 @@ A small token launchpad on Solana, built on Meteora's Dynamic Bonding Curve (DBC
 npm install
 npm test
 cp .env.example .env
-npm run new-wallet              # makes .devnet-keypair.json; fund it at https://faucet.solana.com
+npm run new-wallet -- ../keys/collect-devnet.json   # makes the deployer wallet OUTSIDE the repo; fund the address it prints at https://faucet.solana.com, and put PARTNER_KEYPAIR=<that path> in .env
 npm run dbc-config -- --check   # print the curve and fee, send nothing
 npm run dbc-config              # create it; copy the two DBC_CONFIG lines into .env
 npm run dev                     # http://localhost:5173

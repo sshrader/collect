@@ -27,8 +27,8 @@ export function App() {
           <header className="top">
             <a className="brand" href="#/">collect<b>.</b></a>
             <nav>
-              <a href="#/">Tokens</a>
-              <a href="#/create" className="primary">Launch a token</a>
+              <a href="#/">Coins</a>
+              <a href="#/create" className="primary">Launch a coin</a>
               <WalletMultiButton />
             </nav>
           </header>

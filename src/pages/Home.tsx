@@ -13,10 +13,12 @@ export function Home() {
   return (
     <section>
       <div className="hero">
-        <h1>A coin with 40 collectibles.</h1>
+        <span className="tag"><i></i>Devnet · building in public</span>
+        <h1><span className="neon">A coin with</span><br /><span className="alt">40 collectibles</span></h1>
         <p>Launch a coin on a Meteora bonding curve, with an optional dev buy. Describe your characters and Collect draws 40 unique ones. Each holder who qualifies is sent one as an NFT, and only one wallet can own each.</p>
         <a className="btn primary" href="#/create">Launch a coin</a>
       </div>
+      <div className="label"><b>01</b> Coins</div>
       <input className="search" placeholder="Search name, ticker or mint" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search tokens" />
       {error && <p className="err">{error}</p>}
       {tokens && tokens.length === 0 && <p className="dim">{q ? 'No tokens match that search.' : 'No tokens launched yet. Be the first.'}</p>}

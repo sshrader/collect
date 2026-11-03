@@ -13,7 +13,7 @@ export type TokenView = {
   collection: Collection | null;
 };
 
-export type Slot = { n: number; name: string; attributes: { label: string; value: string }[]; image: string | null; owner: string | null; asset: string | null };
+export type Slot = { n: number; name: string; attributes: { label: string; value: string }[]; image: string | null; owner: string | null; asset: string | null; minting: boolean };
 export type Collection = { theme: string; size: number; state: 'generating' | 'open'; minPct: number; minTokens: number; ready: number; claimed: number; slots: Slot[] };
 export type TraitRow = { label: string; options: string };
 export type AppConfig = { ready: boolean; cluster: string; maxDevBuy: number; launchFee: number; slots: number; realArt: boolean; minting: boolean };

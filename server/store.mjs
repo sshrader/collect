@@ -121,5 +121,6 @@ export const collectionView = (t) => ({
     image: s.status === 'ready' ? `/nft/${t.id}/${s.n}.${s.ext}` : null,
     owner: s.owner || null,
     asset: s.mintStatus === 'done' ? s.asset : null,
+    minting: s.mintStatus === 'minting', // assigned, NFT not sent yet (or failing: see the server log)
   })),
 });

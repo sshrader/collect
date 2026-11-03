@@ -62,6 +62,8 @@ export function TokenPage({ keyId }: { keyId: string }) {
                   <b>{s.name}</b>
                   <small>{s.attributes.map((a) => a.value).join(' · ')}</small>
                   <small className={s.owner ? 'own' : 'dim'}>{s.owner ? `Owner ${short(s.owner)}` : 'Unclaimed'}</small>
+                  {s.asset && <small><a href={explorer('address', s.asset)} target="_blank" rel="noopener noreferrer">View NFT</a></small>}
+                  {s.minting && <small className="dim">Sending NFT... (stuck? see the server log)</small>}
                 </figcaption>
               </figure>
             ))}

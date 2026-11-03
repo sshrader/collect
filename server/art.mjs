@@ -10,11 +10,32 @@ const URL_ = process.env.IMAGE_API_URL || 'https://api.openai.com/v1/images/gene
 const MODEL = process.env.IMAGE_MODEL || 'gpt-image-2.5-flare';
 const SIZE = process.env.IMAGE_SIZE || '1024x1024';
 const QUALITY = (process.env.IMAGE_QUALITY || '').trim(); // low | medium | high; empty = the service default
+const PROVIDER = (process.env.IMAGE_PROVIDER || 'openai').toLowerCase(); // openai | gemini
 const MAX_BYTES = 6_000_000;
 
 export const usingAi = () => !!KEY;
 
 const isPng = (b) => b.length > 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47;
+
+/** Google's Gemini image models (free tier in Google AI Studio). Key from aistudio.google.com. */
+async function fromGemini(prompt) {
+  const model = process.env.IMAGE_MODEL || 'gemini-2.5-flash-image';
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-goog-api-key': KEY },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['IMAGE'] } }),
+    signal: AbortSignal.timeout(120_000),
+  });
+  if (!res.ok) throw new Error(`image service answered ${res.status}`);
+  const j = await res.json();
+  const part = (j?.candidates?.[0]?.content?.parts || []).find((x) => x.inlineData?.data || x.inline_data?.data);
+  const b64 = part?.inlineData?.data || part?.inline_data?.data;
+  if (!b64) throw new Error('image service returned no image (the prompt may have been blocked)');
+  const bytes = Buffer.from(b64, 'base64');
+  if (bytes.length > MAX_BYTES) throw new Error('image is too large');
+  if (!isPng(bytes)) throw new Error('image service did not return a PNG');
+  return { bytes, ext: 'png' };
+}
 
 async function fromAi(prompt) {
   const res = await fetch(URL_, {
@@ -61,5 +82,6 @@ export function placeholder(slot, seed = '') {
 
 /** Draws one slot. `seed` should be the coin id so placeholders differ per coin. */
 export async function render(slot, seed) {
-  return KEY ? fromAi(slot.prompt) : placeholder(slot, seed);
+  if (!KEY) return placeholder(slot, seed);
+  return PROVIDER === 'gemini' ? fromGemini(slot.prompt) : fromAi(slot.prompt);
 }

@@ -25,7 +25,7 @@ export function App() {
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           <header className="top">
-            <a className="brand" href="#/">collect<b>.</b></a>
+            <a className="brand" href="#/"><svg className="mark" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2" y="2" width="9" height="9" rx="2" fill="#b6ff1a" /><rect x="13" y="2" width="9" height="9" rx="2" fill="#22e5ff" /><rect x="2" y="13" width="9" height="9" rx="2" fill="#ff2bd6" /><rect x="13" y="13" width="9" height="9" rx="2" fill="none" stroke="#b6ff1a" strokeWidth="2" /></svg>collect</a>
             <nav>
               <a href="#/">Coins</a>
               <a href="#/create" className="primary">Launch a coin</a>

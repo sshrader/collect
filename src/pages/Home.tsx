@@ -13,8 +13,8 @@ export function Home() {
   return (
     <section>
       <div className="hero">
-        <span className="tag"><i></i>Devnet · building in public</span>
-        <h1><span className="neon">A coin with</span><br /><span className="alt">40 collectibles</span></h1>
+        <span className="tag"><i></i>Devnet · test coins</span>
+        <h1><span className="neon">A coin with</span><br /><span className="alt">40 collectibles.</span></h1>
         <p>Launch a coin on a Meteora bonding curve, with an optional dev buy. Describe your characters and Collect draws 40 unique ones. Each holder who qualifies is sent one as an NFT, and only one wallet can own each.</p>
         <a className="btn primary" href="#/create">Launch a coin</a>
       </div>

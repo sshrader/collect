@@ -7,8 +7,9 @@ import crypto from 'node:crypto';
 
 const KEY = (process.env.IMAGE_API_KEY || '').trim();
 const URL_ = process.env.IMAGE_API_URL || 'https://api.openai.com/v1/images/generations';
-const MODEL = process.env.IMAGE_MODEL || 'gpt-image-1';
+const MODEL = process.env.IMAGE_MODEL || 'gpt-image-2.5-flare';
 const SIZE = process.env.IMAGE_SIZE || '1024x1024';
+const QUALITY = (process.env.IMAGE_QUALITY || '').trim(); // low | medium | high; empty = the service default
 const MAX_BYTES = 6_000_000;
 
 export const usingAi = () => !!KEY;
@@ -19,7 +20,7 @@ async function fromAi(prompt) {
   const res = await fetch(URL_, {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${KEY}` },
-    body: JSON.stringify({ model: MODEL, prompt, n: 1, size: SIZE }),
+    body: JSON.stringify({ model: MODEL, prompt, n: 1, size: SIZE, ...(QUALITY ? { quality: QUALITY } : {}) }),
     signal: AbortSignal.timeout(120_000),
   });
   if (!res.ok) throw new Error(`image service answered ${res.status}`);
